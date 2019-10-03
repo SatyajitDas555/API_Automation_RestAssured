@@ -12,7 +12,7 @@ public class BaseClass {
 
 	@BeforeMethod
 	public void testSetUp() throws IOException {
-		FileInputStream fis=new FileInputStream(System.getProperty("user.dir")+"/src/main/resources/env.properties");
+		FileInputStream fis=new FileInputStream(System.getProperty("user.dir")+"/src/test/resources/env.properties");
 		prop.load(fis);
 	}
 
