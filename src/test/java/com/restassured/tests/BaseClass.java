@@ -38,7 +38,7 @@ public class BaseClass {
         if (result.getStatus() == ITestResult.FAILURE) {
             ExtentTestManager.getTest().log(LogStatus.FAIL, result.getThrowable());
         } else if (result.getStatus() == ITestResult.SKIP) {
-            ExtentTestManager.getTest().log(LogStatus.SKIP, "Test skipped " + result.getThrowable());
+            ExtentTestManager.getTest().log(LogStatus.SKIP, "Test skipped " + "<td><tr>"+ result.getThrowable().getMessage()+"</tr></td>");
         } else {
             ExtentTestManager.getTest().log(LogStatus.PASS, "Test passed");
         }

@@ -101,4 +101,80 @@ public class CreateUserApi extends BaseClass{
 
 	}
 
+	// Negative Scenario by passing expected wrong name value 
+	
+	@Test
+	public void Negative_createUser() {
+
+		//Set baseURI
+		String url = prop.getProperty("Endpoint");
+		String resource = Resources.usersResource();
+
+		RestAssured.baseURI= url;
+
+		ExtentTestManager.getTest().log(LogStatus.INFO, "URI is: " +url);
+		ExtentTestManager.getTest().log(LogStatus.INFO, "Resource is: " +resource);
+		//To get the raw response
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.body(Payload.postUsersData())
+				.post(resource);
+		ExtentTestManager.getTest().log(LogStatus.INFO, "Response Body is: " +response.getBody().asString());
+		
+		//Validating status code = 201
+		Assert.assertEquals(response.statusCode(), 201);
+		ExtentTestManager.getTest().log(LogStatus.PASS, "Response Status Code Matched");
+
+		
+		//Get JSONPath instance by pass raw response to rawToJson reusable method
+		JsonPath jsonPath = ReusableMethods.rawToJson(response);
+		
+		//Validating the value for the corresponding key
+		Assert.assertEquals(jsonPath.get("name"), "morpheus123","Response body does not contain morpheus as name");
+		ExtentTestManager.getTest().log(LogStatus.PASS, "Response body contains \"morpheus\" as \"name\"");
+		
+		//Validating the value for the corresponding key
+		Assert.assertEquals(jsonPath.get("job"), "zion resident","Response body does not contain zion resident as job");
+		ExtentTestManager.getTest().log(LogStatus.PASS, "Response body contains \"zion resident\" as \"job\"");
+
+		//Validating JSON Schema
+		response.then().assertThat().body(matchesJsonSchemaInClasspath("POST_CreateUserSchema.json"));
+		ExtentTestManager.getTest().log(LogStatus.PASS, "JSON Schema validated successfully");
+	}
+	
+	// Negative Scenario for register Api by passing wrong expected error message
+	
+	@Test
+	public void Negative_registerUser() {
+
+		String url = prop.getProperty("Endpoint");
+		String resource = Resources.registerResource();
+
+		//Set baseURI
+		RestAssured.baseURI= url;
+		ExtentTestManager.getTest().log(LogStatus.INFO, "URI is: " +url);
+		ExtentTestManager.getTest().log(LogStatus.INFO, "Resource is: " +resource);
+		//To get the raw response
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.body(Payload.postRegisterData())
+				.post(resource);
+		ExtentTestManager.getTest().log(LogStatus.INFO, "Response Body is: " +response.getBody().asString());
+
+		//Validating status code = 400
+		Assert.assertEquals(response.statusCode(), 400);
+		ExtentTestManager.getTest().log(LogStatus.PASS, "Response Status Code Matched");
+
+		//Get JSONPath instance by pass raw response to rawToJson reusable method
+		JsonPath jsonPath = ReusableMethods.rawToJson(response);
+		
+		//Validating the value for the corresponding key
+		Assert.assertEquals(jsonPath.get("error"), "Missing123 password","Error message doesn't match");
+		ExtentTestManager.getTest().log(LogStatus.PASS, "Response body contains \"Missing password\" as \"error\"");
+
+		//Validating JSON Schema
+		response.then().assertThat().body(matchesJsonSchemaInClasspath("POST_RegisterSchema.json"));
+		ExtentTestManager.getTest().log(LogStatus.PASS, "JSON Schema validated successfully");
+
+	}
 }

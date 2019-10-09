@@ -35,7 +35,7 @@ public class UpdateUserApi extends BaseClass{
 		ExtentTestManager.getTest().log(LogStatus.INFO, "Response Body is: " +response.getBody().asString());
 
 		//Validating status code = 200
-		Assert.assertEquals(response.statusCode(), 200);
+		Assert.assertEquals(response.statusCode(), 200, "Status code is not 200");
 		ExtentTestManager.getTest().log(LogStatus.PASS, "Response Status Code 200");
 
 		//Get JSONObject instance by passing response as a String to verify keys
@@ -52,7 +52,7 @@ public class UpdateUserApi extends BaseClass{
 		//Get JSONPath instance by pass raw response to rawToJson reusable method
 		JsonPath jsonPath = ReusableMethods.rawToJson(response);
 		//Validating the value for the corresponding keys
-		Assert.assertEquals(jsonPath.get("name"), "morpheus");
+		Assert.assertEquals(jsonPath.get("name"), "morpheus", "Response Body doesn't contains  \"morpheus\" as \"name\"");
 		ExtentTestManager.getTest().log(LogStatus.PASS, "Response Body contains  \"morpheus\" as \"name\"");
 		Assert.assertEquals(jsonPath.get("job"), "zion resident");
 		ExtentTestManager.getTest().log(LogStatus.PASS, "Response Body contains  \"zion resident\" as \"job\"");
@@ -62,4 +62,44 @@ public class UpdateUserApi extends BaseClass{
 		ExtentTestManager.getTest().log(LogStatus.PASS, "JSON Schema validated successfully");
 
 	}
+	
+	
+	// Negative Scenario : verifying job value by passing wrong expected value 
+	
+	@Test
+	public void Negative_updateUserDetails() {
+
+		String url = prop.getProperty("Endpoint");
+		String resource = Resources.userIdDetailsResource(2);
+		//Set baseURI
+		RestAssured.baseURI= url;
+		ExtentTestManager.getTest().log(LogStatus.INFO, "URI is: " +url);
+		ExtentTestManager.getTest().log(LogStatus.INFO, "Resource is: " +resource);
+		//To get the raw response
+		Response response = RestAssured.given()
+				.contentType(ContentType.JSON)
+				.body(Payload.PutUsersData())
+				.put(resource);
+		ExtentTestManager.getTest().log(LogStatus.INFO, "Response Body is: " +response.getBody().asString());
+
+		//Validating status code = 200
+		Assert.assertEquals(response.statusCode(), 200, "Status code is not 200");
+		ExtentTestManager.getTest().log(LogStatus.PASS, "Response Status Code 200");
+
+
+		//Get JSONPath instance by pass raw response to rawToJson reusable method
+		JsonPath jsonPath = ReusableMethods.rawToJson(response);
+		
+		//Validating the value for the corresponding keys
+		Assert.assertEquals(jsonPath.get("name"), "morpheus", "Response Body doesn't contains  \"morpheus\" as \"name\"");
+		ExtentTestManager.getTest().log(LogStatus.PASS, "Response Body contains  \"morpheus\" as \"name\"");
+		Assert.assertEquals(jsonPath.get("job"), "zion_resident","Response Body does not contain zion resident as job");
+		ExtentTestManager.getTest().log(LogStatus.PASS, "Response Body contains  \"zion resident\" as \"job\"");
+
+		//Validating JSON Schema
+		response.then().assertThat().body(matchesJsonSchemaInClasspath("PUT_UpdateUserSchema.json"));
+		ExtentTestManager.getTest().log(LogStatus.PASS, "JSON Schema validated successfully");
+
+	}
 }
+
